@@ -36,14 +36,19 @@ python manage.py consume_saic_mqtt
 ## Docker compose
 
 1. Copy `.env.example` to `.env`
-2. Fill in your SAIC username and password
-3. Start the stack:
+2. Start the base stack:
 
 ```bash
 docker compose up --build
 ```
 
-The SAIC gateway publishes into Mosquitto and the `ingest` service subscribes to `saic/vehicles/+/...` topics to build historical trip data.
+3. When you are ready to connect to the upstream SAIC service, fill in `SAIC_USERNAME` and `SAIC_PWD` in `.env` and enable the gateway profile:
+
+```bash
+docker compose --profile saic up --build
+```
+
+The base stack starts Django, PostgreSQL, Mosquitto, and the ingest worker. The optional `saic` profile adds the upstream gateway, which publishes into Mosquitto while the `ingest` service subscribes to `saic/vehicles/+/...` topics to build historical trip data.
 
 ## Running tests
 
