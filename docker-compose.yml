@@ -1,0 +1,50 @@
+services:
+  web:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - mqtt
+
+  ingest:
+    build: .
+    command: python manage.py consume_saic_mqtt
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - mqtt
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"
+
+  saic-mqtt-gateway:
+    image: saicismartapi/saic-python-mqtt-gateway:latest
+    env_file:
+      - .env
+    environment:
+      MQTT_URI: tcp://mqtt:1883
+      SAIC_USER: ${SAIC_USERNAME}
+      SAIC_PASSWORD: ${SAIC_PWD}
+    depends_on:
+      - mqtt
+
+volumes:
+  postgres-data:

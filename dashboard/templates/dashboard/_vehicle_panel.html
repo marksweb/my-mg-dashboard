@@ -1,0 +1,84 @@
+<div class="layout">
+    <section class="stats">
+        <article class="card">
+            <h2>{{ vehicle.name|default:vehicle.vin }}</h2>
+            <p>VIN: {{ vehicle.vin }}</p>
+        </article>
+        <article class="card">
+            <h2>Latest battery health</h2>
+            <p>{% if vehicle.latest_battery_health_percent %}{{ vehicle.latest_battery_health_percent }}%{% else %}Add a reference battery capacity to compare degradation over time.{% endif %}</p>
+        </article>
+        <article class="card">
+            <h2>Latest SOC</h2>
+            <p>{% if latest_soc_snapshot and latest_soc_snapshot.soc_kwh %}{{ latest_soc_snapshot.soc_kwh }} kWh{% else %}No SOC samples yet.{% endif %}</p>
+        </article>
+        <article class="card">
+            <h2>Latest odometer</h2>
+            <p>{% if latest_odometer_snapshot and latest_odometer_snapshot.odometer_miles %}{{ latest_odometer_snapshot.odometer_miles }} miles{% else %}No mileage samples yet.{% endif %}</p>
+        </article>
+    </section>
+
+    <section class="card">
+        <h2>Most frequent routes</h2>
+        <div id="route-map-{{ vehicle.pk }}" class="map"></div>
+        {{ frequent_routes|json_script:"route-data" }}
+        <script>
+            (() => {
+                const mapId = "route-map-{{ vehicle.pk }}";
+                const mapElement = document.getElementById(mapId);
+                const routeDataElement = document.getElementById("route-data");
+                const routeData = routeDataElement ? JSON.parse(routeDataElement.textContent) : [];
+                if (!mapElement || !window.L) {
+                    return;
+                }
+                if (mapElement._leaflet_id) {
+                    mapElement._leaflet_id = null;
+                    mapElement.innerHTML = "";
+                }
+                const map = L.map(mapId);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "&copy; OpenStreetMap contributors",
+                }).addTo(map);
+
+                if (routeData.length === 0) {
+                    map.setView([51.5072, -0.1276], 6);
+                    return;
+                }
+
+                const bounds = [];
+                routeData.forEach((route) => {
+                    const polyline = L.polyline(route.path, { weight: Math.min(8, 2 + route.count), opacity: 0.8 });
+                    polyline.addTo(map).bindPopup(`${route.count} similar trips`);
+                    bounds.push(...route.path);
+                });
+                map.fitBounds(bounds);
+            })();
+        </script>
+    </section>
+
+    <section class="card">
+        <h2>Recent trips</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>Distance</th>
+                    <th>Efficiency</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trip in trips %}
+                    <tr>
+                        <td>{{ trip.started_at }}</td>
+                        <td>{{ trip.distance_miles }} miles</td>
+                        <td>{% if trip.efficiency_mi_per_kwh %}{{ trip.efficiency_mi_per_kwh }} mi/kWh{% else %}Pending{% endif %}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">No trips have been recorded yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
