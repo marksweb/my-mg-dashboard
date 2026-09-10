@@ -10,6 +10,15 @@ services:
       - db
       - mqtt
 
+  shell:
+    build: .
+    command: sh -c "sleep infinity"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - mqtt
+
   ingest:
     build: .
     command: python manage.py consume_saic_mqtt
@@ -25,6 +34,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
@@ -43,6 +54,7 @@ services:
       - .env
     environment:
       MQTT_URI: tcp://mqtt:1883
+      MQTT_TOPIC: saic
       SAIC_USER: ${SAIC_USERNAME}
       SAIC_PASSWORD: ${SAIC_PWD}
     depends_on:

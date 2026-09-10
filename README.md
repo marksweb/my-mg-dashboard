@@ -48,7 +48,15 @@ docker compose up --build
 docker compose --profile saic up --build
 ```
 
-The base stack starts Django, PostgreSQL, Mosquitto, and the ingest worker. The optional `saic` profile adds the upstream gateway, which publishes into Mosquitto while the `ingest` service subscribes to `saic/vehicles/+/...` topics to build historical trip data.
+The base stack starts Django, PostgreSQL, Mosquitto, and the ingest worker. The optional `saic` profile adds the upstream gateway, which publishes into Mosquitto with the `saic` topic prefix while the `ingest` service subscribes to `saic/vehicles/+/...` topics to build historical trip data.
+
+To open a shell in the Django image for admin tasks like `createsuperuser`:
+
+```bash
+docker compose run --rm shell python manage.py createsuperuser
+```
+
+The database is exposed on `localhost:5432`, using the same `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` values from `.env`.
 
 ## Running tests
 
