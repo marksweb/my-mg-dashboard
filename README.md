@@ -7,6 +7,7 @@ MQTT stream.
 ## What it does
 
 - consumes SAIC MQTT topics for trips, GPS position, state of charge, mileage, and battery capacity
+- tracks door/window/lock state so you can see if a window or door was left open
 - writes historical vehicle data into Django models that work with PostgreSQL in Docker
 - calculates trip efficiency in mi/kWh from journey distance and SOC deltas
 - tracks battery degradation over time from total battery capacity samples
@@ -48,7 +49,7 @@ docker compose up --build
 docker compose --profile saic up --build
 ```
 
-The base stack starts Django, PostgreSQL, Mosquitto, and the ingest worker. The optional `saic` profile adds the upstream gateway, which publishes into Mosquitto with the `saic` topic prefix while the `ingest` service subscribes to `saic/vehicles/+/...` topics to build historical trip data.
+The base stack starts Django, PostgreSQL, Mosquitto, and the ingest worker. The optional `saic` profile adds the upstream gateway, which publishes into Mosquitto with the `saic` topic prefix while the `ingest` service subscribes to `saic/+/vehicles/+/#` topics (the gateway nests vehicle topics under an account segment, e.g. `saic/<saic_user>/vehicles/<vin>/...`) to build historical trip data.
 
 To open a shell in the Django image for admin tasks like `createsuperuser`:
 

@@ -39,6 +39,7 @@ def _build_vehicle_panel_context(vehicle):
             odometer_miles__isnull=True
         ).first(),
         "frequent_routes": frequent_routes[:5],
+        "status": getattr(vehicle, "status", None),
     }
 
 
@@ -57,7 +58,7 @@ def index(request):
 
 
 def vehicle_panel(request, pk):
-    vehicle = get_object_or_404(Vehicle.objects.prefetch_related("trips__points", "snapshots"), pk=pk)
+    vehicle = get_object_or_404(Vehicle.objects.select_related("status").prefetch_related("trips__points", "snapshots"), pk=pk)
     return render(
         request,
         "dashboard/_vehicle_panel.html",

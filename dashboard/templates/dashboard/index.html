@@ -42,7 +42,7 @@
 
         <section id="vehicle-panel">
             {% if selected_vehicle_panel %}
-                {% include "dashboard/_vehicle_panel.html" with vehicle=selected_vehicle_panel.vehicle trips=selected_vehicle_panel.trips latest_soc_snapshot=selected_vehicle_panel.latest_soc_snapshot latest_odometer_snapshot=selected_vehicle_panel.latest_odometer_snapshot frequent_routes=selected_vehicle_panel.frequent_routes %}
+                {% include "dashboard/_vehicle_panel.html" with vehicle=selected_vehicle_panel.vehicle trips=selected_vehicle_panel.trips latest_soc_snapshot=selected_vehicle_panel.latest_soc_snapshot latest_odometer_snapshot=selected_vehicle_panel.latest_odometer_snapshot frequent_routes=selected_vehicle_panel.frequent_routes status=selected_vehicle_panel.status %}
             {% endif %}
         </section>
     </main>
