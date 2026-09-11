@@ -16,6 +16,39 @@
             <h2>Latest odometer</h2>
             <p>{% if latest_odometer_snapshot and latest_odometer_snapshot.odometer_miles %}{{ latest_odometer_snapshot.odometer_miles }} miles{% else %}No mileage samples yet.{% endif %}</p>
         </article>
+        <article class="card">
+            <h2>Security &amp; closures</h2>
+            {% if status %}
+                <p>
+                    {% if status.doors_locked is True %}🔒 Locked{% elif status.doors_locked is False %}🔓 Unlocked{% else %}Lock state unknown{% endif %}
+                </p>
+                <p>
+                    {% if status.any_window_open %}⚠ Window open{% elif status.any_window_open is False %}✔ Windows closed{% else %}No window data yet.{% endif %}
+                </p>
+                <p>
+                    {% if status.any_door_open %}⚠ Door open{% elif status.any_door_open is False %}✔ Doors closed{% else %}No door data yet.{% endif %}
+                </p>
+                <details>
+                    <summary>Details</summary>
+                    <ul>
+                        <li>Driver door: {% if status.door_driver is True %}open{% elif status.door_driver is False %}closed{% else %}—{% endif %}</li>
+                        <li>Passenger door: {% if status.door_passenger is True %}open{% elif status.door_passenger is False %}closed{% else %}—{% endif %}</li>
+                        <li>Rear left door: {% if status.door_rear_left is True %}open{% elif status.door_rear_left is False %}closed{% else %}—{% endif %}</li>
+                        <li>Rear right door: {% if status.door_rear_right is True %}open{% elif status.door_rear_right is False %}closed{% else %}—{% endif %}</li>
+                        <li>Bonnet: {% if status.door_bonnet is True %}open{% elif status.door_bonnet is False %}closed{% else %}—{% endif %}</li>
+                        <li>Boot: {% if status.door_boot is True %}open{% elif status.door_boot is False %}closed{% else %}—{% endif %}</li>
+                        <li>Driver window: {% if status.window_driver is True %}open{% elif status.window_driver is False %}closed{% else %}—{% endif %}</li>
+                        <li>Passenger window: {% if status.window_passenger is True %}open{% elif status.window_passenger is False %}closed{% else %}—{% endif %}</li>
+                        <li>Rear left window: {% if status.window_rear_left is True %}open{% elif status.window_rear_left is False %}closed{% else %}—{% endif %}</li>
+                        <li>Rear right window: {% if status.window_rear_right is True %}open{% elif status.window_rear_right is False %}closed{% else %}—{% endif %}</li>
+                        <li>Sun roof: {% if status.window_sun_roof is True %}open{% elif status.window_sun_roof is False %}closed{% else %}—{% endif %}</li>
+                    </ul>
+                    {% if status.status_updated_at %}<p>Updated {{ status.status_updated_at }}</p>{% endif %}
+                </details>
+            {% else %}
+                <p>No door or window data yet.</p>
+            {% endif %}
+        </article>
     </section>
 
     <section class="card">

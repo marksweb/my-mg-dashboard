@@ -19,7 +19,7 @@ class Command(BaseCommand):
             client.username_pw_set(settings.SAIC_MQTT_USERNAME, settings.SAIC_MQTT_PASSWORD)
 
         def on_connect(client, userdata, flags, reason_code, properties):
-            topic = f"{settings.SAIC_MQTT_TOPIC_PREFIX}/vehicles/+/#"
+            topic = f"{settings.SAIC_MQTT_TOPIC_PREFIX}/+/vehicles/+/#"
             LOG.info("Connected to MQTT broker; subscribing to %s", topic)
             client.subscribe(topic)
 
